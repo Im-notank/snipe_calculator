@@ -15,7 +15,7 @@ $(document).ready(function() {
     colNameRow.prepend(cell1);
 
     var cell2 = $('<td>').append('<input type="time" name="incoming" step="1">'); // Set step to 1 to allow seconds input
-    var cell3 = $('<td>').append('<input type="number" name="seconds" min="0" max="600">');
+    var cell3 = $('<td>').append('<input type="number" name="seconds" min="0">');
     var cell4 = $('<td>').append('<span></span>');
     var cell5 = $('<td>').append('<span></span>');
 
@@ -54,15 +54,20 @@ $(document).ready(function() {
       // Create Date objects in the local time zone
       var incomingTimeLocal = new Date(incomingDateTimeString);
 
+      // Format incoming time in HH:mm:ss format
+      var formattedIncomingTime = incomingTimeLocal.toTimeString().slice(0, 8);
+
       // Calculate send time
-      var sendTime = new Date(incomingTimeLocal.getTime() - numberOfSeconds * 1000);
+      var sendTimeLocal = new Date(incomingTimeLocal.getTime() - numberOfSeconds * 1000);
+
+      // Format send time in HH:mm:ss format
+      var formattedSendTime = sendTimeLocal.toTimeString().slice(0, 8);
 
       // Calculate return time
-      var returnTime = new Date(sendTime.getTime() + numberOfSeconds * 500);
+      var returnTimeLocal = new Date(sendTimeLocal.getTime() + numberOfSeconds * 500);
 
-      // Format send time and return time in 24-hour format
-      var formattedSendTime = isValidDate(sendTime) ? sendTime.toISOString().substr(11, 8) : "00:00:00";
-      var formattedReturnTime = isValidDate(returnTime) ? returnTime.toISOString().substr(11, 8) : "00:00:00";
+      // Format return time in HH:mm:ss format
+      var formattedReturnTime = returnTimeLocal.toTimeString().slice(0, 8);
 
       // Update display in the table
       cell4.find('span').text(formattedSendTime);
@@ -74,9 +79,4 @@ $(document).ready(function() {
 
     // Initial calculation
     calculateTimes();
-
-    // Function to check if a date is valid
-    function isValidDate(date) {
-        return date instanceof Date && !isNaN(date);
-    }
 });

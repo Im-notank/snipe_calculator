@@ -14,8 +14,8 @@ $(document).ready(function() {
     var cell1 = $('<th>').text("Train").attr("rowspan", "2");
     colNameRow.prepend(cell1);
 
-    var cell2 = $('<td>').append('<input type="time" name="incoming" step="1">').attr("placeholder", "00:00:00 AM"); // Set step to 1 to allow seconds input
-    var cell3 = $('<td>').append('<input type="number" name="seconds" min="0" max="300" step="2" value="0">');
+    var cell2 = $('<td>').append('<input type="time" name="incoming" step="1">'); // Set step to 1 to allow seconds input
+    var cell3 = $('<td>').append('<input type="number" name="seconds" min="0" max="600">');
     var cell4 = $('<td>').append('<span></span>');
     var cell5 = $('<td>').append('<span></span>');
 
@@ -46,26 +46,23 @@ $(document).ready(function() {
       var incomingTimeString = $('input[name="incoming"]').val();
       var numberOfSeconds = parseInt($('input[name="seconds"]').val());
 
-      // Round the number of seconds to the nearest even number
-      if (numberOfSeconds % 2 !== 0) {
-        numberOfSeconds += 1;
-      }
-
-      // Create a valid date string using today's date
+      // Create a valid date string using today's date and the input time
       var today = new Date();
       var todayString = today.toISOString().slice(0, 10);
-
-      // Combine today's date with the time from the input field
       var incomingDateTimeString = todayString + 'T' + incomingTimeString;
 
-      // Create Date objects
-      var incomingTime = new Date(incomingDateTimeString);
-      var sendTime = new Date(incomingTime.getTime() - numberOfSeconds * 1000);
+      // Create Date objects in the local time zone
+      var incomingTimeLocal = new Date(incomingDateTimeString);
+
+      // Calculate send time
+      var sendTime = new Date(incomingTimeLocal.getTime() - numberOfSeconds * 1000);
+
+      // Calculate return time
       var returnTime = new Date(sendTime.getTime() + numberOfSeconds * 500);
 
       // Format send time and return time in 24-hour format
-      var formattedSendTime = isValidDate(sendTime) ? sendTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second: '2-digit'}) : "00:00:00 AM";
-      var formattedReturnTime = isValidDate(returnTime) ? returnTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second: '2-digit'}) : "00:00:00 AM";
+      var formattedSendTime = isValidDate(sendTime) ? sendTime.toISOString().substr(11, 8) : "00:00:00";
+      var formattedReturnTime = isValidDate(returnTime) ? returnTime.toISOString().substr(11, 8) : "00:00:00";
 
       // Update display in the table
       cell4.find('span').text(formattedSendTime);
